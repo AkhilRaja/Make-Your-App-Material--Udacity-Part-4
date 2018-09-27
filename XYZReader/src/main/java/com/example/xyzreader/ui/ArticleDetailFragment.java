@@ -200,7 +200,7 @@ public class ArticleDetailFragment extends Fragment implements
         TextView titleView = mRootView.findViewById(R.id.article_title);
         TextView bylineView =  mRootView.findViewById(R.id.article_byline);
         bylineView.setMovementMethod(new LinkMovementMethod());
-        TextView bodyView = mRootView.findViewById(R.id.article);
+        TextView bodyView = mRootView.findViewById(R.id.article_body);
 
         FloatingActionButton mFab = mRootView.findViewById(R.id.share_fab);
 
