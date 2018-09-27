@@ -1,5 +1,6 @@
 package com.example.xyzreader.ui;
 
+import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.SharedElementCallback;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -142,15 +144,8 @@ public class ArticleListActivity extends AppCompatActivity implements
         LocalBroadcastManager.getInstance(this).registerReceiver(mRefreshingReceiver,
                 filter);
 
-        if (savedInstanceState == null) {
-            startService(new Intent(this, UpdaterService.class));
-        }
-
         mRecyclerView = findViewById(R.id.recycler_view);
         getLoaderManager().initLoader(0, null, this);
-        if (savedInstanceState == null) {
-           // refresh();
-        }
         initCollapsingToolbar();
 
     }
@@ -248,11 +243,6 @@ public class ArticleListActivity extends AppCompatActivity implements
     }
 
 
-    public static boolean getmIsDetailsActivityStarted(){
-        return mIsDetailsActivityStarted;
-    }
-
-
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return ArticleLoader.newAllArticlesInstance(this);
@@ -292,10 +282,10 @@ public class ArticleListActivity extends AppCompatActivity implements
     }
 
 
-
-
     private class Adapter extends RecyclerView.Adapter<ViewHolder> {
         private Cursor mCursor;
+        private int mArticlePosition;
+
 
         public Adapter(Cursor cursor) {
             mCursor = cursor;
@@ -314,8 +304,12 @@ public class ArticleListActivity extends AppCompatActivity implements
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    startActivity(new Intent(Intent.ACTION_VIEW,
-                            ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))));
+                    mArticlePosition = vh.getAdapterPosition();
+
+                    Intent intent = new Intent(Intent.ACTION_VIEW,
+                            ItemsContract.Items.buildItemUri(getItemId(mArticlePosition)));
+                    intent.putExtra(EXTRA_STARTING_ARTICLE_POSITION, mArticlePosition);
+                    startActivity(intent);
                 }
             });
             return vh;
@@ -335,6 +329,8 @@ public class ArticleListActivity extends AppCompatActivity implements
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             mCursor.moveToPosition(position);
+            mArticlePosition = position;
+
             holder.titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
             Date publishedDate = parsePublishedDate();
             if (!publishedDate.before(START_OF_EPOCH.getTime())) {
@@ -371,9 +367,9 @@ public class ArticleListActivity extends AppCompatActivity implements
 
         public ViewHolder(View view) {
             super(view);
-            thumbnailView = (DynamicHeightNetworkImageView) view.findViewById(R.id.thumbnail);
-            titleView = (TextView) view.findViewById(R.id.article_title);
-            subtitleView = (TextView) view.findViewById(R.id.article_subtitle);
+            thumbnailView =  view.findViewById(R.id.thumbnail);
+            titleView =  view.findViewById(R.id.article_title);
+            subtitleView =  view.findViewById(R.id.article_subtitle);
         }
     }
 }

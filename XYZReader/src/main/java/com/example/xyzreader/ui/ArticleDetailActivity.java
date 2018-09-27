@@ -94,7 +94,6 @@ public class ArticleDetailActivity extends AppCompatActivity
         }
 
 
-
         mStartingPosition = getIntent().getIntExtra(EXTRA_STARTING_ARTICLE_POSITION, 0);
         if (savedInstanceState == null) {
             if (getIntent() != null && getIntent().getData() != null) {
@@ -106,13 +105,12 @@ public class ArticleDetailActivity extends AppCompatActivity
             mCurrentPosition = savedInstanceState.getInt(EXTRA_CURRENT_ARTICLE_POSITION);
         }
 
-
-
         getLoaderManager().initLoader(0, null, this);
 
         mPagerAdapter = new MyPagerAdapter(getFragmentManager());
         mPager =  findViewById(R.id.pager);
         mPager.setAdapter(mPagerAdapter);
+        mPager.setCurrentItem(mCurrentPosition);
         mPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -150,10 +148,8 @@ public class ArticleDetailActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        mCursor = cursor;
-        mPagerAdapter.notifyDataSetChanged();
-
         // Select the start ID
+        mCursor = cursor;
         if (mStartId > 0) {
             mCursor.moveToFirst();
             // TODO: optimize
@@ -183,7 +179,7 @@ public class ArticleDetailActivity extends AppCompatActivity
         @Override
         public void setPrimaryItem(ViewGroup container, int position, Object object) {
             super.setPrimaryItem(container, position, object);
-            ArticleDetailFragment fragment = (ArticleDetailFragment) object;
+            mCurrentDetailsFragment = (ArticleDetailFragment) object;
 
         }
 
