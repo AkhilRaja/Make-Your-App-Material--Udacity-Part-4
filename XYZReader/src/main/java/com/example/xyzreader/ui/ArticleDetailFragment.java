@@ -123,7 +123,7 @@ public class ArticleDetailFragment extends Fragment implements LoaderManager.Loa
 
 
         if (Build.VERSION.SDK_INT >= 21) {
-            getActivity().getWindow().setStatusBarColor(Color.TRANSPARENT);
+            getActivity().getWindow().setStatusBarColor(Color.BLACK);
         }
 
 
